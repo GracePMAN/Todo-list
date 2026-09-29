@@ -1,51 +1,126 @@
 /* ==========================================================================
-   Todo List — stylesheet
+   Daily Do — stylesheet
    1. Design tokens
    2. Base / reset
-   3. Layout
-   4. Form + buttons
-   5. Toolbar + filters
-   6. Task list
-   7. Empty state + footer
-   8. Accessibility
-   9. Responsive tweaks
+   3. Layout + screen transitions
+   4. Splash
+   5. Welcome + personalisation
+   6. Form + buttons
+   7. Toolbar + filters
+   8. Task list
+   9. Empty state + footer
+   10. Modal (settings)
+   11. Accessibility
+   12. Responsive tweaks
    ========================================================================== */
 
 /* 1. Design tokens ------------------------------------------------------- */
+/* Daily Do identity: white page, purple brand and actions, dark grey text. */
 :root {
-  --bg: #f3f4f7;
+  --bg: #f7f5fd;
   --surface: #ffffff;
-  --surface-alt: #f7f8fa;
-  --text: #14161a;
-  --muted: #6b7280;
-  --border: #e5e7eb;
-  --accent: #3b82f6;
-  --accent-strong: #2563eb;
-  --accent-soft: rgba(59, 130, 246, 0.15);
-  --danger: #ef4444;
-  --danger-soft: rgba(239, 68, 68, 0.12);
-  --radius-lg: 16px;
-  --radius-md: 10px;
-  --radius-sm: 8px;
-  --shadow: 0 1px 2px rgba(16, 24, 40, 0.04), 0 16px 40px -20px rgba(16, 24, 40, 0.25);
-  --transition: 140ms ease;
+  --surface-alt: #faf8ff;
+  --text: #1a1523;
+  --muted: #6f6780;
+  --border: #e9e4f5;
+  --accent: #6d28d9;
+  --accent-strong: #5b21b6;
+  --accent-soft: rgba(109, 40, 217, 0.08);
+  --accent-line: rgba(109, 40, 217, 0.22);
+  --danger: #dc2626;
+  --danger-soft: rgba(220, 38, 38, 0.09);
+  --warning: #b45309;
+  --warning-soft: rgba(180, 83, 9, 0.10);
+  --success: #047857;
+  --success-soft: rgba(4, 120, 87, 0.10);
+  --on-accent: #ffffff;
+  /* One very subtle brand wash, used only behind the splash mark. */
+  --brand-grad: linear-gradient(140deg, #6d28d9 0%, #7c3aed 100%);
+  --radius-lg: 20px;
+  --radius-md: 12px;
+  --radius-sm: 9px;
+  --shadow-app: 0 1px 2px rgba(26, 21, 35, 0.04), 0 12px 32px -20px rgba(26, 21, 35, 0.22);
+  --shadow-soft: 0 1px 2px rgba(26, 21, 35, 0.04);
+  --transition: 150ms ease;
+  --screen-fade: 260ms ease;
+  /* Minimum comfortable touch target on phones. */
+  --touch: 44px;
+  --shell-max: 860px;
 }
 
+/* Dark mode: dark page, slightly lighter dark app surface, purple brand. */
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #0f1115;
-    --surface: #171a21;
-    --surface-alt: #1e222b;
-    --text: #e9ecf1;
-    --muted: #9aa3b2;
-    --border: #2a2f3a;
-    --accent: #60a5fa;
-    --accent-strong: #93c5fd;
-    --accent-soft: rgba(96, 165, 250, 0.22);
+    --bg: #12101a;
+    --surface: #1b1826;
+    --surface-alt: #221e2f;
+    --text: #f2eff9;
+    --muted: #a49cb8;
+    --border: #302a42;
+    --accent: #a78bfa;
+    --accent-strong: #c4b5fd;
+    --accent-soft: rgba(167, 139, 250, 0.16);
+    --accent-line: rgba(167, 139, 250, 0.34);
     --danger: #f87171;
-    --danger-soft: rgba(248, 113, 113, 0.16);
-    --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 16px 40px -20px rgba(0, 0, 0, 0.8);
+    --danger-soft: rgba(248, 113, 113, 0.14);
+    --warning: #fbbf24;
+    --warning-soft: rgba(251, 191, 36, 0.14);
+    --success: #34d399;
+    --success-soft: rgba(52, 211, 153, 0.14);
+    --on-accent: #1b1826;
+    --brand-grad: linear-gradient(140deg, #7c3aed 0%, #a78bfa 100%);
+    --shadow-app: 0 1px 2px rgba(0, 0, 0, 0.4), 0 16px 40px -24px rgba(0, 0, 0, 0.9);
+    --shadow-soft: 0 1px 2px rgba(0, 0, 0, 0.35);
   }
+}
+
+/* Manual override applied by the theme toggle. :root[data-theme="dark"] has
+   higher specificity (0,2,0) than the :root inside the media query (0,1,0),
+   so an explicit choice always beats the system preference. */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #12101a;
+  --surface: #1b1826;
+  --surface-alt: #221e2f;
+  --text: #f2eff9;
+  --muted: #a49cb8;
+  --border: #302a42;
+  --accent: #a78bfa;
+  --accent-strong: #c4b5fd;
+  --accent-soft: rgba(167, 139, 250, 0.16);
+  --accent-line: rgba(167, 139, 250, 0.34);
+  --danger: #f87171;
+  --danger-soft: rgba(248, 113, 113, 0.14);
+  --warning: #fbbf24;
+  --warning-soft: rgba(251, 191, 36, 0.14);
+  --success: #34d399;
+  --success-soft: rgba(52, 211, 153, 0.14);
+  --on-accent: #1b1826;
+  --brand-grad: linear-gradient(140deg, #7c3aed 0%, #a78bfa 100%);
+  --shadow-app: 0 1px 2px rgba(0, 0, 0, 0.4), 0 16px 40px -24px rgba(0, 0, 0, 0.9);
+  --shadow-soft: 0 1px 2px rgba(0, 0, 0, 0.35);
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg: #f7f5fd;
+  --surface: #ffffff;
+  --surface-alt: #faf8ff;
+  --text: #1a1523;
+  --muted: #6f6780;
+  --border: #e9e4f5;
+  --accent: #6d28d9;
+  --accent-strong: #5b21b6;
+  --accent-soft: rgba(109, 40, 217, 0.08);
+  --accent-line: rgba(109, 40, 217, 0.22);
+  --danger: #dc2626;
+  --danger-soft: rgba(220, 38, 38, 0.09);
+  --warning: #b45309;
+  --warning-soft: rgba(180, 83, 9, 0.10);
+  --success: #047857;
+  --success-soft: rgba(4, 120, 87, 0.10);
+  --on-accent: #ffffff;
+  --brand-grad: linear-gradient(140deg, #6d28d9 0%, #7c3aed 100%);
 }
 
 /* 2. Base / reset ------------------------------------------------------- */
@@ -58,55 +133,163 @@
 body {
   margin: 0;
   min-height: 100vh;
-  padding: clamp(16px, 4vw, 56px) clamp(12px, 4vw, 24px);
+  padding: clamp(20px, 5vw, 64px) clamp(12px, 4vw, 32px);
   display: flex;
   justify-content: center;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial,
     "Noto Sans", sans-serif;
   font-size: 16px;
-  line-height: 1.5;
+  line-height: 1.55;
   color: var(--text);
   background: var(--bg);
   -webkit-font-smoothing: antialiased;
   -webkit-text-size-adjust: 100%;
 }
 
-/* 3. Layout ------------------------------------------------------------- */
+/* 3. Layout + app shell + screen transitions ----------------------------- */
+.screen[hidden] {
+  display: none;
+}
+
+/* Screens fade and lift in so the flow between splash, welcome and the app
+   feels like one continuous movement rather than three separate pages. */
+.screen {
+  animation: screen-in var(--screen-fade) both;
+}
+
+@keyframes screen-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* One large white application container on the page. Sections inside it are
+   separated by spacing and hairlines, never by stacking more cards. */
 .app {
+  position: relative;
   width: 100%;
-  max-width: 640px;
+  max-width: var(--shell-max);
+  padding: clamp(20px, 4vw, 40px);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 28px;
+  box-shadow: var(--shadow-app);
+}
+
+@media (max-width: 900px) {
+  /* Almost full width on smaller screens, with a tighter radius. */
+  .app {
+    max-width: 100%;
+    border-radius: 22px;
+  }
+}
+
+@media (max-width: 560px) {
+  .app {
+    border-radius: 0;
+    border-left: 0;
+    border-right: 0;
+    padding: 20px 16px 28px;
+  }
 }
 
 .app__header {
-  margin-bottom: 20px;
+  margin-bottom: 24px;
   text-align: center;
+}
+
+.brandbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.brandbar__brand {
+  margin: 0;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.brandbar__actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* The toggle shows a moon in light mode and a sun in dark mode, so the icon
+   always advertises what clicking it will do next. */
+.icon-btn__sun {
+  display: none;
+}
+
+:root[data-theme="dark"] .icon-btn__sun {
+  display: block;
+}
+
+:root[data-theme="dark"] .icon-btn__moon {
+  display: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .icon-btn__sun {
+    display: block;
+  }
+
+  :root:not([data-theme="light"]) .icon-btn__moon {
+    display: none;
+  }
 }
 
 .app__title {
   margin: 0 0 6px;
-  font-size: clamp(1.6rem, 6vw, 2.25rem);
+  font-size: clamp(1.7rem, 5.5vw, 2.3rem);
   font-weight: 700;
-  letter-spacing: -0.02em;
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+  color: var(--text);
+  /* The personalised name can be long; keep it from overflowing. */
+  overflow-wrap: anywhere;
 }
 
 .app__subtitle {
   margin: 0;
   color: var(--muted);
-  font-size: 0.925rem;
+  font-size: 0.9rem;
 }
 
+/* Only the welcome and modal panels use .card — inside the app shell the
+   sections are separated by spacing and hairlines instead. */
 .card {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow);
+  box-shadow: var(--shadow-app);
   overflow: hidden;
 }
 
+/* The task area sits inside the app shell, so it is flat: no second card. */
+.app .card {
+  padding: 0;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
 .app__note {
-  margin: 16px 4px 0;
+  margin: 20px 0 0;
   color: var(--muted);
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   text-align: center;
 }
 
@@ -118,17 +301,721 @@ body {
   font-size: 0.775rem;
 }
 
-/* 4. Form + buttons ----------------------------------------------------- */
+/* 4. Splash -------------------------------------------------------------- */
+/* White page, purple brand, minimal styling. */
+.splash {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  text-align: center;
+  background: var(--surface);
+  transition: opacity var(--screen-fade), visibility var(--screen-fade);
+}
+
+.splash.is-leaving {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.splash__inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  max-width: 26ch;
+}
+
+.splash__mark {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  margin-bottom: 20px;
+  color: #ffffff;
+  background: var(--accent);
+  border-radius: 16px;
+  animation: mark-pop 560ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes mark-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.7) rotate(-8deg);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.splash__brand {
+  margin: 0;
+  font-size: clamp(2rem, 8vw, 2.75rem);
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  color: var(--accent);
+  animation: rise 560ms 90ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.splash__tagline {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.95rem;
+  animation: rise 560ms 180ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* A hairline that fills up to signal "loading" without a percentage. */
+.splash__bar {
+  position: relative;
+  width: 132px;
+  height: 3px;
+  margin-top: 22px;
+  overflow: hidden;
+  background: var(--border);
+  border-radius: 999px;
+}
+
+.splash__bar::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  background: var(--accent);
+  transform-origin: left center;
+  animation: bar-fill 1100ms cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+@keyframes bar-fill {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* 5. Welcome + personalisation ------------------------------------------- */
+.welcome {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Sits inside body's padding, so 100vh here would overflow and force a
+     scrollbar on a short screen. */
+  min-height: calc(100vh - 2 * clamp(16px, 4vw, 56px));
+  padding: clamp(12px, 4vw, 40px) 0;
+}
+
+.welcome__card {
+  width: 100%;
+  max-width: 420px;
+  padding: clamp(22px, 5vw, 32px);
+  text-align: center;
+  /* The card here holds focusable fields that must not be clipped. */
+  overflow: visible;
+}
+
+.welcome__step {
+  display: flex;
+  flex-direction: column;
+  animation: step-in 320ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.welcome__step[hidden] {
+  display: none;
+}
+
+@keyframes step-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.welcome__eyebrow {
+  margin: 0 0 8px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.welcome__badge {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  margin: 0 auto 16px;
+  color: var(--success);
+  background: var(--success-soft);
+  border-radius: 50%;
+}
+
+.welcome__title {
+  margin: 0 0 8px;
+  font-size: clamp(1.3rem, 5vw, 1.6rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  overflow-wrap: anywhere;
+}
+
+.welcome__text {
+  margin: 0 0 4px;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.welcome__name {
+  margin: 4px 0 20px;
+  padding: 10px 14px;
+  font-weight: 600;
+  color: var(--accent-strong);
+  background: var(--accent-soft);
+  border-radius: var(--radius-md);
+  overflow-wrap: anywhere;
+}
+
+.welcome__form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  text-align: left;
+}
+
+.welcome__note {
+  margin: 18px 0 0;
+  color: var(--muted);
+  font-size: 0.8rem;
+  text-align: center;
+}
+
+.welcome__form .btn {
+  margin-top: 6px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.field-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.field-label__hint {
+  font-weight: 500;
+  text-transform: lowercase;
+}
+
+.field-input {
+  width: 100%;
+  /* Comfortable tap target, and stops the browser's tiny default sizing. */
+  min-height: var(--touch);
+  padding: 12px 14px;
+  font: inherit;
+  font-size: 1rem;
+  color: var(--text);
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+.field-input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.field-error {
+  margin: 0;
+  color: var(--danger);
+  font-size: 0.8rem;
+}
+
+.field-error[hidden] {
+  display: none;
+}
+
+/* 6. Statistics ---------------------------------------------------------- */
+/* Statistics: a quiet band, separated by a hairline rather than a card. */
+.stats {
+  margin: 0 0 28px;
+  padding: 18px 0 20px;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.stats__grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin: 0;
+}
+
+.stats__item {
+  min-width: 0;
+  text-align: center;
+}
+
+.stats__label {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.stats__value {
+  margin: 4px 0 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+.stats__bar {
+  position: relative;
+  height: 6px;
+  margin-top: 12px;
+  overflow: hidden;
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+}
+
+.stats__fill {
+  display: block;
+  width: 0;
+  height: 100%;
+  background: var(--accent);
+  border-radius: 999px;
+  transition: width var(--transition);
+}
+
+/* 6b. Focus for today ---------------------------------------------------- */
+/* These sit inside the centred header, so they reset the alignment. */
+.focus-today,
+.focus-mode {
+  text-align: left;
+}
+
+.focus-today {
+  margin: 0 0 16px;
+  padding: 14px 16px 16px;
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+
+.focus-today[hidden] {
+  display: none;
+}
+
+.focus-today__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 2px;
+}
+
+.focus-today__heading {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.focus-today__summary {
+  margin: 0 0 10px;
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.focus-today__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.focus-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 8px;
+  border-radius: var(--radius-md);
+  background: var(--surface-alt);
+  transition: background-color var(--transition);
+}
+
+.focus-row:hover {
+  background: var(--accent-soft);
+}
+
+.focus-row__check {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+.focus-row__text {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.focus-row__title {
+  font-size: 0.9rem;
+  overflow-wrap: anywhere;
+}
+
+.focus-row__reason {
+  align-self: flex-start;
+  padding: 0 6px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--accent-strong);
+  background: var(--accent-soft);
+  border-radius: var(--radius-sm);
+}
+
+.focus-row__reason.is-overdue {
+  color: var(--danger);
+  background: var(--danger-soft);
+}
+
+.focus-row__actions {
+  flex: none;
+}
+
+.focus-row__actions .icon-btn {
+  width: auto;
+  height: auto;
+  padding: 6px 10px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--accent);
+  background: transparent;
+  border: 1px solid var(--border);
+  opacity: 1;
+}
+
+/* 6c. Focus mode, streak, toast, archive, recurrence chip ---------------- */
+.focus-mode {
+  margin: 0 0 16px;
+  padding: 18px;
+  background: var(--surface);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-lg);
+}
+
+.focus-mode[hidden] {
+  display: none;
+}
+
+.focus-mode__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.focus-mode__heading {
+  margin: 0;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.focus-mode__body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.focus-mode__empty {
+  margin: 0 0 4px;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.focus-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+
+.focus-card--primary {
+  padding: 18px;
+  background: var(--accent-soft);
+  border-color: transparent;
+}
+
+.focus-card__check {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  font-size: 1.4rem;
+  line-height: 1;
+  color: var(--accent);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: color var(--transition), background-color var(--transition);
+}
+
+.focus-card__check:hover {
+  color: #ffffff;
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.focus-card--primary .focus-card__check {
+  width: 48px;
+  height: 48px;
+  font-size: 1.7rem;
+}
+
+.focus-card__body {
+  min-width: 0;
+}
+
+.focus-card__title {
+  margin: 0;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.focus-card--primary .focus-card__title {
+  font-size: 1.15rem;
+  line-height: 1.35;
+}
+
+.focus-card__meta {
+  margin: 3px 0 0;
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.streak {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 12px 0 0;
+  padding: 4px 10px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--warning);
+  background: var(--warning-soft);
+  border-radius: 999px;
+}
+
+.streak[hidden] {
+  display: none;
+}
+
+/* 6d. Toast, recurrence chip, archive, cheer, settings sections ---------- */
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 20px;
+  z-index: 80;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  max-width: min(92vw, 420px);
+  padding: 12px 16px;
+  color: #ffffff;
+  background: var(--text);
+  border-radius: var(--radius-md);
+  box-shadow: 0 12px 30px -12px rgba(0, 0, 0, 0.5);
+  transform: translateX(-50%);
+  animation: toast-in 180ms ease both;
+}
+
+.toast[hidden] {
+  display: none;
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 8px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+.toast__message {
+  min-width: 0;
+  font-size: 0.85rem;
+  overflow-wrap: anywhere;
+}
+
+.toast__action {
+  flex: none;
+  padding: 6px 12px;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--accent);
+  background: transparent;
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.toast__action:hover {
+  color: #ffffff;
+  background: var(--accent);
+}
+
+.todo-item__recurrence {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  align-self: flex-start;
+  padding: 1px 8px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--accent-strong);
+  background: var(--accent-soft);
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.todo-item__recurrence[hidden] {
+  display: none;
+}
+
+.icon-btn--archive:hover {
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.todo-item.is-archived .todo-item__title {
+  color: var(--muted);
+}
+
+.empty-state__cheer {
+  margin-top: 10px;
+  padding: 6px 12px;
+  font-size: 0.8rem;
+  color: var(--accent-strong);
+  background: var(--accent-soft);
+  border-radius: 999px;
+}
+
+.empty-state__cheer[hidden] {
+  display: none;
+}
+
+.settings__section {
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+.settings__subtitle {
+  margin: 0 0 6px;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.settings__note {
+  margin: 0 0 10px;
+  text-align: left;
+}
+
+.settings__actions {
+  justify-content: flex-start;
+}
+
+.btn--sm {
+  padding: 6px 10px;
+  font-size: 0.78rem;
+}
+
+/* 7. Form + buttons ----------------------------------------------------- */
 .todo-form {
   display: flex;
   gap: 10px;
+  align-items: flex-end;
   padding: 16px;
   border-bottom: 1px solid var(--border);
 }
 
-.todo-form__input {
+.todo-form__fields {
   flex: 1 1 auto;
   min-width: 0;
+  display: flex;
+  gap: 10px;
+  align-items: flex-end;
+}
+
+.todo-form__fields > .field:first-child {
+  flex: 1 1 auto;
+}
+
+/* The label sits above its input on every width so the date box keeps a
+   predictable size and the native picker stays tappable. */
+.field--date {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.todo-form__input {
+  width: 100%;
   padding: 12px 14px;
   font: inherit;
   font-size: 0.975rem;
@@ -147,6 +1034,126 @@ body {
   outline: none;
   border-color: var(--accent);
   box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+/* Native date picker, themed to match the rest of the form. */
+.todo-form__date,
+.todo-item__edit-date {
+  padding: 11px 12px;
+  font: inherit;
+  font-size: 0.9rem;
+  color: var(--text);
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  /* Comfortable tap target on touch screens. */
+  min-height: 44px;
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+.todo-form__date:focus,
+.todo-item__edit-date:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.btn--block {
+  width: 100%;
+}
+
+.btn--danger {
+  color: #ffffff;
+  background: var(--danger);
+}
+
+.btn--danger:hover {
+  filter: brightness(1.08);
+}
+
+/* The quick-add path stays a single row unless the user asks for more. */
+.todo-form {
+  flex-wrap: wrap;
+}
+
+.field--grow {
+  flex: 1 1 auto;
+}
+
+.todo-form__actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.btn--options {
+  padding: 10px 12px;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+.btn__plus {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.todo-form__options {
+  flex: 1 1 100%;
+  padding-top: 12px;
+  border-top: 1px dashed var(--border);
+}
+
+.todo-form__options[hidden] {
+  display: none;
+}
+
+.todo-form__options-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.todo-form__note {
+  margin: 10px 0 0;
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.todo-form__note:empty {
+  display: none;
+}
+
+.form-select {
+  width: 100%;
+  min-height: var(--touch);
+  padding: 11px 12px;
+  font: inherit;
+  font-size: 0.9rem;
+  color: var(--text);
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+.form-select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.form-select--sm {
+  width: auto;
+  max-width: 100%;
+  min-height: 36px;
+  padding: 6px 10px;
+  font-size: 0.8rem;
+}
+
+.field--inline {
+  flex: 0 1 auto;
+  min-width: 0;
 }
 
 .btn {
@@ -171,15 +1178,22 @@ body {
   transform: translateY(1px);
 }
 
+/* Primary: purple fill, white text. */
 .btn--primary {
-  color: #ffffff;
+  color: var(--on-accent);
   background: var(--accent);
+  font-weight: 600;
 }
 
 .btn--primary:hover {
   background: var(--accent-strong);
 }
 
+.btn--primary:active {
+  transform: translateY(1px);
+}
+
+/* Secondary: neutral surface, purple text and a purple border on hover. */
 .btn--ghost {
   padding: 8px 12px;
   font-size: 0.85rem;
@@ -188,8 +1202,9 @@ body {
 }
 
 .btn--ghost:hover:not(:disabled) {
-  color: var(--danger);
-  background: var(--danger-soft);
+  color: var(--accent);
+  background: var(--accent-soft);
+  box-shadow: inset 0 0 0 1px var(--accent-line);
 }
 
 .btn:disabled {
@@ -197,7 +1212,74 @@ body {
   cursor: not-allowed;
 }
 
-/* 5. Toolbar + filters -------------------------------------------------- */
+/* 8. Toolbar + filters -------------------------------------------------- */
+.search {
+  position: relative;
+  flex: 1 1 100%;
+  display: flex;
+  align-items: center;
+}
+
+.search__icon {
+  position: absolute;
+  left: 12px;
+  color: var(--muted);
+  pointer-events: none;
+}
+
+.search__input {
+  width: 100%;
+  min-height: var(--touch);
+  padding: 10px 38px 10px 34px;
+  font: inherit;
+  font-size: 0.9rem;
+  color: var(--text);
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+.search__input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.search__input::-webkit-search-cancel-button {
+  display: none;
+}
+
+.search__clear {
+  position: absolute;
+  right: 6px;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  color: var(--muted);
+  background: transparent;
+  border: 0;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.search__clear[hidden] {
+  display: none;
+}
+
+.search__clear:hover {
+  color: var(--text);
+  background: var(--border);
+}
+
+.toolbar__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
 .toolbar {
   display: flex;
   flex-wrap: wrap;
@@ -208,6 +1290,8 @@ body {
   border-bottom: 1px solid var(--border);
 }
 
+/* The filter group scrolls horizontally rather than clipping its last pill on
+   narrow screens; a hidden pill would look like a bug. */
 .filters {
   display: flex;
   gap: 2px;
@@ -215,13 +1299,21 @@ body {
   background: var(--surface-alt);
   border: 1px solid var(--border);
   border-radius: 999px;
+  max-width: 100%;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.filters::-webkit-scrollbar {
+  display: none;
 }
 
 .filter {
-  padding: 6px 14px;
+  flex: none;
+  padding: 7px 16px;
   font: inherit;
   font-size: 0.85rem;
-  font-weight: 500;
+  font-weight: 600;
   color: var(--muted);
   background: transparent;
   border: 0;
@@ -231,16 +1323,16 @@ body {
 }
 
 .filter:hover {
-  color: var(--text);
+  color: var(--accent);
+  background: var(--accent-soft);
 }
 
 .filter.is-active {
-  color: var(--accent-strong);
-  background: var(--surface);
-  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.14);
+  color: var(--on-accent);
+  background: var(--accent);
 }
 
-/* 6. Task list ---------------------------------------------------------- */
+/* 9. Task list ---------------------------------------------------------- */
 .todo-list {
   margin: 0;
   padding: 8px;
@@ -254,22 +1346,62 @@ body {
   display: flex;
   align-items: center;
   gap: 4px;
-  padding: 8px 8px 8px 10px;
+  padding: 8px 8px 8px 4px;
   border: 1px solid transparent;
+  /* The left edge is the visual "rail" used to flag overdue tasks. */
+  border-left: 3px solid transparent;
   border-radius: var(--radius-md);
-  transition: background-color var(--transition), border-color var(--transition);
+  background: var(--surface);
+  transition: background-color var(--transition), border-color var(--transition),
+    opacity var(--transition);
 }
 
 .todo-item:hover {
   background: var(--surface-alt);
   border-color: var(--border);
+  border-left-color: transparent;
+}
+
+/* Only becomes grabbable once JS has enabled dragging, so the cursor is
+   never misleading. */
+.todo-item[draggable="true"] {
+  cursor: grab;
+}
+
+.todo-item.is-dragging {
+  opacity: 0.5;
+  cursor: grabbing;
+}
+
+.todo-item__handle {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: var(--touch);
+  color: var(--muted);
+  opacity: 0;
+  cursor: grab;
+  transition: opacity var(--transition);
+}
+
+.todo-item:hover .todo-item__handle,
+.todo-item:focus-within .todo-item__handle {
+  opacity: 1;
+}
+
+.todo-item__actions {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 2px;
 }
 
 .todo-item__label {
   flex: 1 1 auto;
   min-width: 0;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 12px;
   padding: 4px 0;
   cursor: pointer;
@@ -277,10 +1409,20 @@ body {
 
 .todo-item__checkbox {
   flex: none;
+  /* Nudged down so it aligns with the first text line now that rows can
+     wrap onto two lines when a due date is present. */
+  margin-top: 2px;
   width: 20px;
   height: 20px;
   accent-color: var(--accent);
   cursor: pointer;
+}
+
+.todo-item__text {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
 }
 
 .todo-item__title {
@@ -294,8 +1436,182 @@ body {
   text-decoration-thickness: 1.5px;
 }
 
-.todo-item__edit-input {
+.todo-item__meta {
+  min-width: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+/* Shared chip look for due date, category, priority and reminder. */
+.todo-item__due,
+.todo-item__category,
+.todo-item__priority,
+.todo-item__reminder {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  align-self: flex-start;
+  padding: 1px 8px 1px 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--muted);
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  white-space: nowrap;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: color var(--transition), background-color var(--transition),
+    border-color var(--transition);
+}
+
+.todo-item__due[hidden],
+.todo-item__category[hidden],
+.todo-item__priority[hidden],
+.todo-item__reminder[hidden] {
+  display: none;
+}
+
+.todo-item__due::before,
+.todo-item__category::before,
+.todo-item__priority::before,
+.todo-item__reminder::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  flex: none;
+  background: currentColor;
+  border-radius: 50%;
+}
+
+/* Category chips read as a labelled tag rather than a status dot. */
+.todo-item__category {
+  border-radius: var(--radius-sm);
+  border-style: dashed;
+}
+
+.todo-item__category::before {
+  display: none;
+}
+
+/* Priority: colour AND a distinct glyph shape AND the word itself, so the
+   level is still clear in greyscale or with colour vision deficiency. */
+.todo-item__priority::before {
+  width: auto;
+  height: auto;
+  border-radius: 0;
+  font-size: 0.7rem;
+  line-height: 1;
+}
+
+/* Priority uses an arrow scale as well as colour and the written word, so the
+   level survives greyscale and colour-vision deficiency. */
+.todo-item.is-priority-low .todo-item__priority::before {
+  content: "\2193"; /* down arrow */
+}
+
+.todo-item.is-priority-medium .todo-item__priority::before {
+  content: "\2192"; /* right arrow */
+}
+
+.todo-item.is-priority-high .todo-item__priority::before {
+  content: "\2191"; /* up arrow */
+}
+
+.todo-item.is-priority-low .todo-item__priority {
+  color: var(--muted);
+  background: var(--surface-alt);
+}
+
+.todo-item.is-priority-medium .todo-item__priority {
+  color: var(--accent-strong);
+  background: var(--accent-soft);
+  border-color: transparent;
+}
+
+.todo-item.is-priority-high .todo-item__priority {
+  color: var(--danger);
+  background: var(--danger-soft);
+  border-color: transparent;
+}
+
+/* Reminder chip is deliberately low-key until the time is close. */
+.todo-item__reminder::before {
+  border-radius: 1px;
+  width: 7px;
+  height: 7px;
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+}
+
+.todo-item.is-reminder-due .todo-item__reminder {
+  color: var(--warning);
+  background: var(--warning-soft);
+  border-color: transparent;
+}
+
+.todo-item.is-reminder-past .todo-item__reminder {
+  color: var(--muted);
+  background: transparent;
+  border-style: dashed;
+}
+
+.todo-item.is-today .todo-item__due {
+  color: var(--success);
+  background: var(--success-soft);
+  border-color: transparent;
+}
+
+.todo-item.is-overdue .todo-item__due {
+  color: var(--danger);
+  background: var(--danger-soft);
+  border-color: transparent;
+}
+
+.todo-item.is-tomorrow .todo-item__due {
+  color: var(--warning);
+  background: var(--warning-soft);
+  border-color: transparent;
+}
+
+/* Overdue: a soft red wash on the row plus the red rail. Subtle, but the
+   chip text ("2 days overdue") carries the same information. */
+.todo-item.is-overdue {
+  background: var(--danger-soft);
+  border-left-color: var(--danger);
+}
+
+.todo-item.is-overdue:hover {
+  border-color: var(--danger);
+  border-left-color: var(--danger);
+}
+
+.todo-item.is-done .todo-item__due {
+  color: var(--muted);
+  background: transparent;
+  border-color: var(--border);
+}
+
+.todo-item__editor {
   flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.todo-item__editor .form-select {
+  flex: 1 1 130px;
+  min-width: 0;
+  min-height: 40px;
+  padding: 8px 10px;
+  font-size: 0.85rem;
+}
+
+.todo-item__edit-input {
+  flex: 1 1 160px;
   min-width: 0;
   margin: 4px 0;
   padding: 8px 10px;
@@ -340,7 +1656,54 @@ body {
   background: var(--danger-soft);
 }
 
-/* 7. Empty state + footer ---------------------------------------------- */
+/* The date and settings buttons are not per-row hover actions, so they are
+   always visible. */
+.icon-btn--ghost {
+  opacity: 1;
+  width: 36px;
+  height: 36px;
+  color: var(--muted);
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+
+.icon-btn--ghost:hover {
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.icon-btn--date:hover {
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.icon-btn--move {
+  /* Shown on hover/focus like the other row actions, but always visible on
+     touch devices where there is no hover. */
+  opacity: 0;
+  width: 30px;
+  height: 30px;
+}
+
+.todo-item:hover .icon-btn--move,
+.todo-item:focus-within .icon-btn--move {
+  opacity: 1;
+}
+
+.icon-btn--move:hover {
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+
+/* A row that cannot move any further (first/last) is dimmed, not hidden, so
+   the row layout never jumps. */
+.icon-btn--move:disabled {
+  opacity: 0;
+  cursor: default;
+  pointer-events: none;
+}
+
+/* 10. Empty state + footer ---------------------------------------------- */
 .empty-state {
   margin: 0;
   padding: 44px 24px 48px;
@@ -393,7 +1756,64 @@ body {
   color: var(--danger);
 }
 
-/* 8. Accessibility ----------------------------------------------------- */
+/* 10. Modal (settings) ---------------------------------------------------- */
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+}
+
+.modal[hidden] {
+  display: none;
+}
+
+.modal__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 17, 21, 0.55);
+  animation: fade-in var(--screen-fade) both;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.modal__panel {
+  position: relative;
+  width: 100%;
+  max-width: 380px;
+  padding: 22px;
+  animation: step-in 240ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.modal__title {
+  margin: 0 0 14px;
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.modal__message {
+  margin: 0 0 4px;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.modal__actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-top: 10px;
+}
+
+/* 11. Accessibility ----------------------------------------------------- */
 .visually-hidden {
   position: absolute;
   width: 1px;
@@ -413,7 +1833,10 @@ body {
 }
 
 .todo-form__input:focus-visible,
-.todo-item__edit-input:focus-visible {
+.field-input:focus-visible,
+.todo-item__edit-input:focus-visible,
+.todo-form__date:focus-visible,
+.todo-item__edit-date:focus-visible {
   outline: none;
 }
 
@@ -426,11 +1849,21 @@ body {
   }
 }
 
-/* 9. Responsive tweaks ------------------------------------------------- */
+/* 12. Responsive tweaks ------------------------------------------------- */
 @media (max-width: 520px) {
   .todo-form {
     flex-direction: column;
     align-items: stretch;
+  }
+
+  /* Stack the task text above the date so both stay full width and tappable. */
+  .todo-form__fields {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .field--date {
+    flex: 1 1 auto;
   }
 
   .btn--primary {
@@ -455,9 +1888,97 @@ body {
     width: 100%;
   }
 
-  /* Touch devices have no hover, so keep actions visible. */
+  /* Touch devices have no hover, so keep row actions visible. */
   .icon-btn {
     opacity: 1;
+  }
+}
+
+@media (max-width: 380px) {
+  .modal__actions {
+    flex-direction: column-reverse;
+  }
+
+  .modal__actions .btn {
+    width: 100%;
+  }
+}
+
+/* Narrow phones: give the row's secondary controls their own line so the
+   task title is never squeezed into a sliver. */
+@media (max-width: 430px) {
+  .todo-item {
+    flex-wrap: wrap;
+    padding-right: 4px;
+  }
+
+  .todo-item__label {
+    flex: 1 1 100%;
+    order: 2;
+    padding-left: 2px;
+  }
+
+  .todo-item__handle {
+    order: 1;
+    opacity: 1;
+  }
+
+  .todo-item__actions {
+    order: 3;
+    margin-left: auto;
+  }
+
+  .todo-item__actions .icon-btn {
+    width: var(--touch);
+    height: var(--touch);
+  }
+
+  .icon-btn--move {
+    width: var(--touch);
+    height: var(--touch);
+  }
+
+  .todo-item__editor {
+    flex-wrap: wrap;
+  }
+
+  .todo-item__editor .form-select,
+  .todo-item__edit-input {
+    flex: 1 1 100%;
+  }
+
+  .stats {
+    padding: 12px;
+  }
+
+  .stats__value {
+    font-size: 1.1rem;
+  }
+
+  .toolbar__row {
+    gap: 6px;
+  }
+
+  .field--inline,
+  .form-select--sm {
+    width: 100%;
+  }
+}
+
+/* Very narrow phones: the three optional-detail fields stack. */
+@media (max-width: 360px) {
+  .todo-form__options-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .todo-form__actions {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+
+  .stats__grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
   }
 }
 

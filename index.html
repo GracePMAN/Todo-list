@@ -3,45 +3,343 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="description" content="A simple, clean todo list. Your tasks are saved in your browser." />
+    <meta
+      name="description"
+      content="Daily Do — a friendly, personal task manager. Tasks and due dates are saved in your browser."
+    />
     <meta name="color-scheme" content="light dark" />
-    <title>Todo List</title>
+    <title>Daily Do</title>
     <link
       rel="icon"
-      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9C%93%3C/text%3E%3C/svg%3E"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%235b5bd6'/%3E%3Cpath d='M9 16.5l4.5 4.5L23 11' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"
     />
     <link rel="stylesheet" href="css/styles.css" />
   </head>
   <body>
-    <main class="app">
+    <!-- 1. Splash — the permanent "Daily Do" brand. Decorative: the brand is
+         repeated in the app shell, so it is hidden from assistive tech. -->
+    <div class="screen splash" id="splash" aria-hidden="true">
+      <div class="splash__inner">
+        <span class="splash__mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="34" height="34" focusable="false">
+            <path
+              d="M5 12.5l4.5 4.5L19 7.5"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </span>
+        <p class="splash__brand">Daily Do</p>
+        <p class="splash__tagline">Get things done, one day at a time.</p>
+        <span class="splash__bar" aria-hidden="true"></span>
+      </div>
+    </div>
+
+    <!-- 2. Welcome / personalisation -->
+    <section class="screen welcome" id="welcome" aria-label="Welcome to Daily Do" hidden>
+      <div class="card welcome__card">
+        <div class="welcome__step" data-step="name" hidden>
+          <p class="welcome__eyebrow">Welcome to Daily Do!</p>
+          <h1 class="welcome__title">Let's create your personal task manager.</h1>
+
+          <form class="welcome__form" id="name-form" novalidate>
+            <label class="field-label" for="name-input">What would you like to call your task manager?</label>
+            <input
+              class="field-input"
+              id="name-input"
+              name="name"
+              type="text"
+              maxlength="60"
+              placeholder="Grace's Tasks"
+              value="My Tasks"
+              autocomplete="off"
+              spellcheck="false"
+              enterkeyhint="done"
+              aria-describedby="name-error"
+            />
+            <p class="field-error" id="name-error" role="alert" hidden></p>
+            <button class="btn btn--primary btn--block" type="submit">Continue</button>
+          </form>
+
+          <p class="welcome__note">
+            &ldquo;Daily&nbsp;Do&rdquo; is the app and always stays on the splash screen. This name is
+            just for your own list.
+          </p>
+        </div>
+
+        <div class="welcome__step" data-step="ready" hidden>
+          <span class="welcome__badge" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="28" height="28" focusable="false">
+              <path
+                d="M5 12.5l4.5 4.5L19 7.5"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </span>
+          <h1 class="welcome__title">Your task manager is ready.</h1>
+          <p class="welcome__text">What would you like to get done today?</p>
+          <p class="welcome__name" id="welcome-name"></p>
+          <button class="btn btn--primary btn--block" id="start-task" type="button">
+            Add your first task
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <main class="screen app" id="app" hidden>
       <header class="app__header">
-        <h1 class="app__title">Todo List</h1>
-        <p class="app__subtitle">Add a task, tick it off, and pick it up later. Everything stays in this browser.</p>
+        <div class="brandbar">
+          <p class="brandbar__brand">Daily&nbsp;Do</p>
+          <div class="brandbar__actions">
+            <button
+              class="icon-btn icon-btn--ghost"
+              id="theme-btn"
+              type="button"
+              title="Switch theme"
+              aria-label="Switch to dark theme"
+            >
+              <!-- Sun shown in dark mode, moon in light mode (CSS swaps them). -->
+              <svg class="icon-btn__sun" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">
+                <path
+                  d="M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10Zm0-14v2m0 14v2M3 12h2m14 0h2M5.6 5.6l1.4 1.4m10 10 1.4 1.4m0-12.8-1.4 1.4m-10 10-1.4 1.4"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                />
+              </svg>
+              <svg class="icon-btn__moon" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">
+                <path
+                  d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5Z"
+                  fill="currentColor"
+                />
+              </svg>
+            </button>
+            <button
+              class="icon-btn icon-btn--ghost"
+              id="settings-btn"
+              type="button"
+              title="Settings"
+              aria-label="Settings"
+              aria-haspopup="dialog"
+            >
+              <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">
+                <path
+                  d="M3 17v2h6v-2H3ZM3 5v2h10V5H3Zm10 16v-2h8v-2h-8v-2h-2v6h2ZM7 9v2H3v2h4v2h2V9H7Zm14 4v-2H11v2h10Zm-6-4h2V7h4V5h-4V3h-2v6Z"
+                  fill="currentColor"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+        <h1 class="app__title" id="workspace-name">My Tasks</h1>
+        <p class="app__subtitle" id="workspace-date"></p>
+
+        <!-- Progress statistics: totals for the whole list, not the filtered view. -->
+        <section class="stats" aria-labelledby="stats-heading">
+          <h2 class="visually-hidden" id="stats-heading">Your progress</h2>
+          <dl class="stats__grid">
+            <div class="stats__item">
+              <dt class="stats__label">Total</dt>
+              <dd class="stats__value" id="stat-total">0</dd>
+            </div>
+            <div class="stats__item">
+              <dt class="stats__label">Done</dt>
+              <dd class="stats__value" id="stat-completed">0</dd>
+            </div>
+            <div class="stats__item">
+              <dt class="stats__label">Left</dt>
+              <dd class="stats__value" id="stat-remaining">0</dd>
+            </div>
+            <div class="stats__item">
+              <dt class="stats__label">Progress</dt>
+              <dd class="stats__value" id="stat-percent">0%</dd>
+            </div>
+          </dl>
+          <div
+            class="stats__bar"
+            role="progressbar"
+            id="stats-progress"
+            aria-labelledby="stats-heading"
+            aria-valuemin="0"
+            aria-valuemax="100"
+            aria-valuenow="0"
+            aria-valuetext="0% complete"
+          >
+            <span class="stats__fill" id="stats-fill"></span>
+          <!-- Completion streak: consecutive days with at least one task done. -->
+          <p class="streak" id="streak" hidden>
+            <span class="streak__flame" aria-hidden="true">🔥</span>
+            <span class="streak__text" id="streak-text"></span>
+          </p>
+        </div>
+        </section>
+
+        <!-- Focus for Today: a short, prioritised shortlist — not a second list. -->
+        <section class="focus-today" id="focus-today" aria-labelledby="focus-today-heading" hidden>
+          <div class="focus-today__head">
+            <h2 class="focus-today__heading" id="focus-today-heading">Focus for today</h2>
+            <button class="btn btn--ghost btn--sm" type="button" id="focus-mode-btn" aria-pressed="false">
+              Focus mode
+            </button>
+          </div>
+          <p class="focus-today__summary" id="focus-today-summary"></p>
+          <ul class="focus-today__list" id="focus-today-list"></ul>
+        </section>
+
+        <!-- Focus Mode: the same app, with everything else quietened. -->
+        <section class="focus-mode" id="focus-mode" aria-labelledby="focus-mode-heading" hidden>
+          <div class="focus-mode__head">
+            <h2 class="focus-mode__heading" id="focus-mode-heading">Focus mode</h2>
+            <button class="btn btn--ghost btn--sm" type="button" id="focus-mode-exit">
+              Exit focus mode
+            </button>
+          </div>
+          <div class="focus-mode__body" id="focus-mode-body"></div>
+        </section>
       </header>
 
       <section class="card" aria-label="Your tasks">
         <form class="todo-form" id="todo-form" novalidate>
-          <label class="visually-hidden" for="todo-input">New task</label>
-          <input
-            class="todo-form__input"
-            id="todo-input"
-            name="todo"
-            type="text"
-            placeholder="What needs to be done?"
-            maxlength="200"
-            autocomplete="off"
-            enterkeyhint="done"
-          />
-          <button class="btn btn--primary" type="submit">Add task</button>
+          <div class="todo-form__fields">
+            <div class="field field--grow">
+              <label class="field-label visually-hidden" for="todo-input">New task</label>
+              <input
+                class="todo-form__input"
+                id="todo-input"
+                name="todo"
+                type="text"
+                placeholder="What needs to be done?"
+                maxlength="200"
+                autocomplete="off"
+                enterkeyhint="done"
+              />
+            </div>
+            <div class="field field--date">
+              <label class="field-label" for="todo-date">
+                Due date <span class="field-label__hint">optional</span>
+              </label>
+              <input class="todo-form__date" id="todo-date" name="due" type="date" />
+            </div>
+          </div>
+
+          <!-- Optional details. Hidden behind a toggle so the quick-add path
+               stays as fast as it was before these features existed. -->
+          <div class="todo-form__options" id="task-options" hidden>
+            <div class="todo-form__options-grid">
+              <div class="field">
+                <label class="field-label" for="todo-category">Category</label>
+                <select class="form-select" id="todo-category" name="category">
+                  <option value="">No category</option>
+                  <option value="work">Work</option>
+                  <option value="personal">Personal</option>
+                  <option value="school">School</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+              <div class="field">
+                <label class="field-label" for="todo-priority">Priority</label>
+                <select class="form-select" id="todo-priority" name="priority">
+                  <option value="low">Low</option>
+                  <option value="medium" selected>Medium</option>
+                  <option value="high">High</option>
+                </select>
+              </div>
+              <div class="field">
+                <label class="field-label" for="todo-reminder">Reminder</label>
+                <input class="form-select" id="todo-reminder" name="reminder" type="datetime-local" />
+              </div>
+              <div class="field">
+                <label class="field-label" for="todo-recurrence">Repeat</label>
+                <select class="form-select" id="todo-recurrence" name="recurrence">
+                  <option value="">Never</option>
+                  <option value="daily">Daily</option>
+                  <option value="weekly">Weekly</option>
+                  <option value="monthly">Monthly</option>
+                </select>
+              </div>
+            </div>
+            <p class="todo-form__note" id="reminder-note"></p>
+            <p class="todo-form__note" id="recurrence-note"></p>
+          </div>
+
+          <div class="todo-form__actions">
+            <button
+              class="btn btn--ghost btn--options"
+              type="button"
+              id="toggle-options"
+              aria-expanded="false"
+              aria-controls="task-options"
+            >
+              <span class="btn__plus" aria-hidden="true">+</span> Add details
+            </button>
+            <button class="btn btn--primary" type="submit">Add task</button>
+          </div>
         </form>
 
         <div class="toolbar">
-          <div class="filters" id="todo-filters" role="group" aria-label="Filter tasks">
-            <button class="filter is-active" type="button" data-filter="all" aria-pressed="true">All</button>
-            <button class="filter" type="button" data-filter="active" aria-pressed="false">Active</button>
-            <button class="filter" type="button" data-filter="completed" aria-pressed="false">Completed</button>
+          <div class="search">
+            <label class="visually-hidden" for="search-input">Search tasks</label>
+            <svg class="search__icon" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false">
+              <path
+                d="M11 4a7 7 0 1 0 0 14 7 7 0 0 0 0-14Zm5 12 4 4"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+              />
+            </svg>
+            <input
+              class="search__input"
+              id="search-input"
+              type="search"
+              placeholder="Search tasks…"
+              autocomplete="off"
+              aria-describedby="search-hint"
+            />
+            <button class="search__clear" id="search-clear" type="button" hidden aria-label="Clear search">
+              <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false">
+                <path
+                  d="M6 6l12 12M18 6L6 18"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                />
+              </svg>
+            </button>
+            <span class="visually-hidden" id="search-hint">Filters the list as you type.</span>
           </div>
-          <button class="btn btn--ghost" type="button" id="clear-completed">Clear completed</button>
+
+          <div class="toolbar__row">
+            <div class="filters" id="todo-filters" role="group" aria-label="Filter tasks">
+              <button class="filter is-active" type="button" data-filter="all" aria-pressed="true">All</button>
+              <button class="filter" type="button" data-filter="active" aria-pressed="false">Active</button>
+              <button class="filter" type="button" data-filter="completed" aria-pressed="false">Completed</button>
+            <button class="filter" type="button" data-filter="archived" aria-pressed="false">Archived</button>
+
+            </div>
+
+            <div class="field field--inline">
+              <label class="visually-hidden" for="category-filter">Filter by category</label>
+              <select class="form-select form-select--sm" id="category-filter">
+                <option value="">All categories</option>
+                <option value="work">Work</option>
+                <option value="personal">Personal</option>
+                <option value="school">School</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+
+            <button class="btn btn--ghost" type="button" id="clear-completed">Clear completed</button>
+          </div>
         </div>
 
         <ul class="todo-list" id="todo-list"></ul>
@@ -50,6 +348,7 @@
           <span class="empty-state__icon" aria-hidden="true">✅</span>
           <strong class="empty-state__title" id="empty-title"></strong>
           <span class="empty-state__text" id="empty-text"></span>
+          <span class="empty-state__cheer" id="empty-cheer" hidden></span>
         </p>
 
         <footer class="app__footer">
@@ -63,28 +362,200 @@
       </p>
     </main>
 
+    <!-- Undo toast: a task deleted by mistake can be put back exactly as it was. -->
+    <div class="toast" id="undo-toast" role="status" aria-live="polite" hidden>
+      <span class="toast__message" id="undo-message"></span>
+      <button class="toast__action" type="button" id="undo-button">Undo</button>
+    </div>
+
+    <!-- Settings: rename the user's own task manager. The "Daily Do" product
+         name is deliberately not editable. -->
+    <div class="modal" id="settings-modal" hidden>
+      <div class="modal__backdrop" id="settings-backdrop"></div>
+      <div
+        class="modal__panel card"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="settings-title"
+        id="settings-panel"
+      >
+        <h2 class="modal__title" id="settings-title">Settings</h2>
+        <form class="welcome__form" id="settings-form" novalidate>
+          <label class="field-label" for="settings-name">Task manager name</label>
+          <input
+            class="field-input"
+            id="settings-name"
+            name="name"
+            type="text"
+            maxlength="60"
+            autocomplete="off"
+            spellcheck="false"
+            aria-describedby="settings-error"
+          />
+          <p class="field-error" id="settings-error" role="alert" hidden></p>
+          <div class="modal__actions">
+            <button class="btn btn--ghost" type="button" id="settings-cancel">Cancel</button>
+            <button class="btn btn--primary" type="submit">Save</button>
+          </div>
+        </form>
+        <div class="settings__section">
+          <h3 class="settings__subtitle">Backup</h3>
+          <p class="welcome__note settings__note">
+            Everything lives in this browser. Export a copy before clearing site data or switching device.
+          </p>
+          <div class="modal__actions settings__actions">
+            <button class="btn btn--ghost" type="button" id="export-btn">Export</button>
+            <button class="btn btn--ghost" type="button" id="import-btn">Import</button>
+            <input type="file" id="import-file" accept="application/json,.json" hidden />
+          </div>
+          <p class="field-error" id="backup-status" role="status" aria-live="polite" hidden></p>
+        </div>
+
+        <p class="welcome__note">
+          &ldquo;Daily&nbsp;Do&rdquo; is the app name and always stays. You can rename your task
+          manager whenever you like.
+        </p>
+      </div>
+    </div>
+
+    <!-- Confirmation for destructive bulk actions. -->
+    <div class="modal" id="confirm-modal" hidden>
+      <div class="modal__backdrop" id="confirm-backdrop"></div>
+      <div
+        class="modal__panel card"
+        role="alertdialog"
+        aria-modal="true"
+        aria-labelledby="confirm-title"
+        aria-describedby="confirm-message"
+        id="confirm-panel"
+      >
+        <h2 class="modal__title" id="confirm-title">Are you sure?</h2>
+        <p class="modal__message" id="confirm-message"></p>
+        <div class="modal__actions">
+          <button class="btn btn--ghost" type="button" id="confirm-cancel">Cancel</button>
+          <button class="btn btn--danger" type="button" id="confirm-ok">Delete</button>
+        </div>
+      </div>
+    </div>
+
     <template id="todo-item-template">
       <li class="todo-item">
+        <span class="todo-item__handle" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="16" height="16" focusable="false">
+            <path
+              d="M9 6h.01M15 6h.01M9 12h.01M15 12h.01M9 18h.01M15 18h.01"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+              stroke-linecap="round"
+            />
+          </svg>
+        </span>
+
         <label class="todo-item__label">
           <input class="todo-item__checkbox" type="checkbox" />
-          <span class="todo-item__title"></span>
+          <span class="todo-item__text">
+            <span class="todo-item__title"></span>
+            <span class="todo-item__meta">
+              <span class="todo-item__due" hidden></span>
+              <span class="todo-item__category" hidden></span>
+              <span class="todo-item__priority" hidden></span>
+              <span class="todo-item__reminder" hidden></span>
+              <span class="todo-item__recurrence" hidden></span>
+            </span>
+          </span>
         </label>
-        <button class="icon-btn icon-btn--edit" type="button" title="Edit task">
-          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">
+
+        <div class="todo-item__actions">
+          <!-- Keyboard- and mobile-accessible alternative to dragging. -->
+          <button
+            class="icon-btn icon-btn--move"
+            type="button"
+            title="Move up"
+            data-move="up"
+            aria-label="Move task up"
+          >
+            <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false">
+              <path
+                d="M12 19V5M6 11l6-6 6 6"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </button>
+          <button
+            class="icon-btn icon-btn--move"
+            type="button"
+            title="Move down"
+            data-move="down"
+            aria-label="Move task down"
+          >
+            <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false">
+              <path
+                d="M12 5v14M6 13l6 6 6-6"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </button>
+          <button
+            class="icon-btn icon-btn--archive"
+            type="button"
+            title="Archive task"
+            data-archive="archive"
+            aria-label="Archive task"
+          >
+            <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">
+              <path
+                d="M3 5h18v4H3V5Zm1 6h16v8a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-8Zm6 3v2h4v-2H10Z"
+                fill="currentColor"
+              />
+            </svg>
+          </button>
+          <button class="icon-btn icon-btn--edit" type="button" title="Edit task" aria-label="Edit task">
+            <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">
             <path
               d="M4 20h4l10-10-4-4L4 16v4Zm12.7-12.3 1.3-1.3a1 1 0 0 1 1.4 0l1.2 1.2a1 1 0 0 1 0 1.4l-1.3 1.3-2.6-2.6Z"
               fill="currentColor"
             />
           </svg>
         </button>
-        <button class="icon-btn icon-btn--danger" type="button" title="Delete task">
+        <button
+          class="icon-btn icon-btn--date"
+          type="button"
+          title="Change due date"
+          aria-label="Change due date"
+        >
           <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">
             <path
-              d="M9 3h6l1 2h4v2H4V5h4l1-2Zm-3 6h12l-1 11a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1L6 9Z"
-              fill="currentColor"
+              d="M7 2v3M17 2v3M3.5 9.5h17M5.5 4h13a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.7"
+              stroke-linecap="round"
             />
           </svg>
         </button>
+          <button
+            class="icon-btn icon-btn--danger"
+            type="button"
+            title="Delete task"
+            aria-label="Delete task"
+          >
+            <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">
+              <path
+                d="M9 3h6l1 2h4v2H4V5h4l1-2Zm-3 6h12l-1 11a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1L6 9Z"
+                fill="currentColor"
+              />
+            </svg>
+          </button>
+        </div>
       </li>
     </template>
 
